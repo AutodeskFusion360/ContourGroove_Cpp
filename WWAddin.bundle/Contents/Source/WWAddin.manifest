@@ -7,7 +7,7 @@
 	},
 	"supportedOS":	"windows",
 	"id":	"dc10d64f-8e76-4478-bd55-65bedfca3e8a",
-	"version":	"1.0",
-	"runOnStartup":	false,
+	"version":	"2.0.0",
+	"runOnStartup":	true,
 	"sourcewindows":	"WWAddin.vcxproj"
 }

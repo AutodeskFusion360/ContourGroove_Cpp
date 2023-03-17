@@ -5,7 +5,7 @@
 	AutodeskProduct="Fusion360"
 	Name="WWAddin"
 	Description="App for generating image groove."
-	AppVersion="1.0.0"
+	AppVersion="2.0.0"
 	Author="Autodesk, Inc."
 	AppNameSpace="com.autodesk.exchange.Fusion360.WWAddin"
 	HelpFile="./Contents/docs/ContourGroove.html"
@@ -23,7 +23,7 @@
 
 	<Components>
 		<RuntimeRequirements SupportPath="./Contents/docs" OS="win64" Platform="Fusion360" SeriesMin="" />
-		    <ComponentEntry AppName="WWAddin" Version="1.0.0" ModuleName="./Contents/WWAddin.manifest" AppDescription="App for generating contour groove from extracted edges of an image." />
+		    <ComponentEntry AppName="WWAddin" Version="2.0.0" ModuleName="./Contents/WWAddin.manifest" AppDescription="App for generating contour groove from extracted edges of an image." />
 	</Components>
 	
 </ApplicationPackage>

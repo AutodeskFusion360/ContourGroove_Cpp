@@ -70,6 +70,7 @@ the use of this software, even if advised of the possibility of such damage.
 using namespace adsk::core;
 using namespace adsk::fusion;
 
+
 Ptr<Application> app;
 Ptr<UserInterface> ui;
 Ptr<Component> newComp;
@@ -389,7 +390,7 @@ cv::Mat dst;
 cv::Mat detected_edges;
 int lowThreshold = 50;
 int const max_lowThreshold = 100;
-int ratio = 3;
+int ratio3 = 3;
 int kernel_size = 3;
 const char* window_name = "Contour groove";
 
@@ -402,28 +403,36 @@ static bool showPreview = false;
 
 static void CannyThreshold(int, void*)
 {
-	if (!detected_edges.empty() && detected_edges.data)
+	try
 	{
-		detected_edges.release();
+		if (!detected_edges.empty() && detected_edges.data)
+		{
+			detected_edges.release();
+		}
+		detected_edges = cv::Scalar::all(0);
+	
+	
+		blur(src_gray, detected_edges, cv::Size(3, 3));
+	
+		Canny(detected_edges, detected_edges, lowThreshold, lowThreshold * ratio3, kernel_size);
+
+		findContours(detected_edges, contours, hierarchy, 3/*=RETR_TREE*/, 2/*=CHAIN_APPROX_SIMPLE*/, cv::Point(0, 0));
+
+		dst = cv::Mat::zeros(detected_edges.size(), CV_8UC3);
+		for (int i = 0; i < contours.size(); i++)
+		{
+			cv::Scalar color = cv::Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
+			drawContours(dst, contours, i, color, 2, 8, hierarchy, 0, cv::Point());
+		}
+
+		if (showPreview)
+		{
+			cv::imshow(window_name, dst);
+		}
 	}
-	detected_edges = cv::Scalar::all(0);
-
-	blur(src_gray, detected_edges, cv::Size(3, 3));
-
-	Canny(detected_edges, detected_edges, lowThreshold, lowThreshold*ratio, kernel_size);
-
-	findContours(detected_edges, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
-
-	dst = cv::Mat::zeros(detected_edges.size(), CV_8UC3);
-	for (int i = 0; i < contours.size(); i++)
+	catch (exception ex)
 	{
-		cv::Scalar color = cv::Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
-		drawContours(dst, contours, i, color, 2, 8, hierarchy, 0, cv::Point());
-	}
-
-	if (showPreview)
-	{
-		cv::imshow(window_name, dst);
+		string str = "asd";
 	}
 }
 
@@ -807,12 +816,14 @@ bool isApplicationStartup(std::string context)
 	return res;
 }
 
+
 extern "C" XI_EXPORT bool run(const char* context)
 {
 	const std::string commandName = "Contour groove";
 	const std::string commandDescription = "Creates a grooved outline from edges identified from an image.";
 	const std::string commandResources = "./resources";
 
+	
 	app = Application::get();
 	if (!app)
 		return false;
@@ -829,7 +840,11 @@ extern "C" XI_EXPORT bool run(const char* context)
 	if (!modelingWorkspace)
 		return false;
 
-	Ptr<ToolbarPanels> toolbarPanels = modelingWorkspace->toolbarPanels();
+	Ptr<ToolbarTabs> modelingWorkspaceTabs = modelingWorkspace->toolbarTabs();
+
+	Ptr<ToolbarTab> createTab = modelingWorkspaceTabs->item(0);
+
+	Ptr<ToolbarPanels> toolbarPanels = createTab->toolbarPanels();
 	if (!toolbarPanels)
 		return false;
 	Ptr<ToolbarPanel> toolbarPanel = toolbarPanels->item(0);
@@ -871,6 +886,7 @@ extern "C" XI_EXPORT bool run(const char* context)
 		if (!isApplicationStartup(context))
 			ui->messageBox("Contour Groove is loaded successfully.\r\n\r\nYou can run it from the create panel in modeling workspace.");
 	}
+	
 
 	return true;
 }
@@ -879,6 +895,12 @@ extern "C" XI_EXPORT bool stop(const char* context)
 {
 	if (ui)
 	{
+		Ptr<CommandDefinitions> commandDefinitions = ui->commandDefinitions();
+		Ptr<CommandDefinition> commandDefinition = commandDefinitions->itemById(commandId);
+		if (commandDefinition)
+		{
+			commandDefinition->deleteMe();
+		}
 		ui = nullptr;
 	}
 	cvCleanup();
