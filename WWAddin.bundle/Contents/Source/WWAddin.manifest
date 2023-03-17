@@ -1,0 +1,13 @@
+{
+	"autodeskProduct":	"Fusion360",
+	"type":	"addin",
+	"author":	"Balaji ",
+	"description":	{
+		"":	"Contour groove Demo"
+	},
+	"supportedOS":	"windows",
+	"id":	"dc10d64f-8e76-4478-bd55-65bedfca3e8a",
+	"version":	"1.0",
+	"runOnStartup":	false,
+	"sourcewindows":	"WWAddin.vcxproj"
+}
